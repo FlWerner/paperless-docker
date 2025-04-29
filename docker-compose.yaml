@@ -24,8 +24,8 @@ services:
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - ./site:/srv
-      - ./cert.pem:/etc/ssl/private/cert.pem
-      - ./key.pem:/etc/ssl/private/key.pem 
+      - ./domain.crt:/etc/ssl/private/domain.crt
+      - ./domain.key:/etc/ssl/private/domain.key
       - caddy_data:/data
       - caddy_config:/config
     networks:
