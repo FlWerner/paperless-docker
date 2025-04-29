@@ -30,6 +30,7 @@ services:
       - caddy_config:/config
     networks:
       - external_net
+      - internal_net
 
   webserver:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
