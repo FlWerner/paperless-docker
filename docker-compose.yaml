@@ -1,0 +1,62 @@
+services:
+  broker:
+    image: docker.io/library/redis:7
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+    networks:
+      - internal_net
+
+  db:
+    image: docker.io/library/mariadb:11
+    restart: unless-stopped
+    volumes:
+      - dbdata:/var/lib/mysql
+    env_file: docker-compose.env
+    networks:
+      - internal_net
+  proxy:
+    image: caddy:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./site:/srv
+      - ./cert.pem:/etc/ssl/private/cert.pem
+      - ./key.pem:/etc/ssl/private/key.pem 
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - external_net
+
+  webserver:
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    restart: unless-stopped
+    depends_on:
+      - db
+      - broker
+    volumes:
+      - data:/usr/src/paperless/data
+      - media:/usr/src/paperless/media
+      - ./export:/usr/src/paperless/export
+      - /media/paperless:/usr/src/paperless/consume
+    env_file: docker-compose.env
+    networks:
+      - internal_net
+
+volumes:
+  data:
+  media:
+  dbdata:
+  redisdata:
+  caddy_data:
+  caddy_config:
+
+networks:
+  internal_net:
+    driver: bridge
+    internal: true  # Nur interner Traffic
+  external_net:
+    driver: bridge

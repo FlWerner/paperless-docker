@@ -1,0 +1,6 @@
+https://hostname:443 {
+    tls internal
+    reverse_proxy http://paperless-webserver-1:8000 {
+        header_down Referrer-Policy "strict-origin-when-cross-origin"
+    }
+}
